@@ -1,0 +1,230 @@
+1.stack
+  #include<stdio.h>
+#include "Employee.h"
+#include "stack.h"
+
+void readEmployees(Employee emp[], int n);
+void displayEmployees(Employee emp[], int n);
+void displayEmployeesUsingStack(Employee emp[], int n);
+void manageEmployees();
+int main() {    
+    manageEmployees(); 
+    return 0;
+}
+void manageEmployees() {
+    int employeeCount;    
+    Employee employees[1000];    
+    int choice;
+    do {
+        printf("Choices:\n");
+        printf("1-Read Employees\n");
+        printf("2-Display Employees\n");
+        printf("3-Display Employees using Stack\n");
+        printf("91-Exit\n");
+        printf("Your Choice:");
+        scanf("%d",&choice);
+        switch(choice) {
+            case 1: {                
+                printf("Enter number of employees:");
+                scanf("%d", &employeeCount);
+                readEmployees(employees, employeeCount);
+            }  break;
+            case 2: {
+                displayEmployees(employees, employeeCount);    
+            } break;
+            case 3: {
+                displayEmployeesUsingStack(employees, employeeCount);    
+            } break;
+            case 91: {
+                printf("Thank you for using app...\n");
+            } break;
+        }
+    } while(choice != 91);
+}
+void readEmployees(Employee emp[], int n) {
+    printf("Enter details (ID, Name, Salary, Department):\n");
+    for(int I = 0; I < n; I++) {
+        scanf("%d%s%f%s", &emp[I].id, emp[I].name, 
+                          &emp[I].salary, emp[I].department);
+    }
+}
+void displayEmployees(Employee emp[], int n) {
+    printf("--------------------------------------------------------------------\n");
+    printf("|%5s|%-20s|%8s|%10s|\n", "ID", "Name", "Salary", "Department");
+    printf("--------------------------------------------------------------------\n");
+    for(int I = 0; I < n; I++) {
+        printf("|%5d|%-20s|%8.2f|%10s|\n", emp[I].id, emp[I].name, 
+                                emp[I].salary, emp[I].department);
+    }
+    printf("--------------------------------------------------------------------\n");
+}
+
+void displayEmployeesUsingStack(Employee emp[], int n) {
+    Stack stk;
+    StackInit(&stk);
+    for(int I = 0; I < n; I++) {
+        StackPush(&stk, emp[I]);
+    }
+    printf("--------------------------------------------------------------------\n");
+    printf("|%5s|%-20s|%8s|%10s|\n", "ID", "Name", "Salary", "Department");
+    printf("--------------------------------------------------------------------\n");
+    while(!StackEmpty(&stk)) {
+        Employee employee = StackTop(&stk); 
+        printf("|%5d|%-20s|%8.2f|%10s|\n", employee.id, employee.name, 
+            employee.salary, employee.department);
+        StackPop(&stk);
+    }
+    printf("--------------------------------------------------------------------\n");
+}
+
+
+2.queue
+  #include<stdio.h>
+#define Queue_SIZE 1000
+typedef float T;
+typedef struct { 
+    T elements[Queue_SIZE];
+    int _size;
+    int _front;
+    int _back;
+} Queue;
+void QueueInit(Queue* stk);
+void QueuePush(Queue* stk, T element);
+int QueueEmpty(Queue* stk);
+T QueueFront(Queue* stk);
+T QueueBack(Queue* stk);
+void QueuePop(Queue* stk);
+int main() {    
+    float salaries[] = {50000, 40000, 48000, 23000, 2000};
+    Queue stk;
+    QueueInit(&stk);
+    for(int I = 0; I < 5; I++) {
+        QueuePush(&stk, salaries[I]);
+    }
+    printf("Salaries from Queue:\n");
+    while(!QueueEmpty(&stk)) {
+        float sal = QueueFront(&stk);
+        printf("%.2f ", sal);
+        QueuePop(&stk);
+    }
+    return 0;
+}
+
+void QueueInit(Queue* stk) {
+    stk->_size = 0;
+    stk->_front = -1;
+    stk->_back = -1;
+}
+void QueuePush(Queue* stk, T element) {
+    stk->_back++;
+    stk->elements[stk->_back] = element;
+    stk->_size++;
+    if(stk->_front == -1) {
+        stk->_front = 0;
+    }
+}
+int QueueEmpty(Queue* stk) {
+    return (stk->_front == -1);
+}
+T QueueFront(Queue* stk) {
+    return stk->elements[stk->_front];
+}
+T QueueBack(Queue* stk) {
+    return stk->elements[stk->_back];
+}
+void QueuePop(Queue* stk) {
+    if(QueueEmpty(stk)) {
+        printf("Queue is empty.\n");
+        return;
+    }
+    if(stk->_front == stk->_back) {
+        stk->_front = -1;
+        stk->_back = -1;
+        stk->_size = 0;
+    } else {
+        stk->_front++;
+    }
+}
+
+3.linkedlist
+  #include<stdio.h>
+#include<stdlib.h>
+typedef float T;
+struct Node_t{
+    T element;
+    struct Node_t* next;
+    struct Node_t* prev;
+};
+typedef struct Node_t Node; 
+
+typedef struct { 
+    Node *head;
+    Node *tail;
+    int _size;
+} List;
+
+void ListInit(List* list);
+Node* CreateNode(T element);
+void ListPushFront(List* list, T element);
+void ListPushBack(List* list, T element);
+int ListEmpty(List* list);
+T ListFront(List* list);
+T ListBack(List* list);
+void ListPopFront(List* list);
+void ListPopBack(List* list);
+
+int main() {
+    float salaries[] = {50000, 40000, 48000, 23000, 2000};
+    List list;
+    ListInit(&list);
+    for(int I = 0; I < 5; I++) {
+        ListPushBack(&list, salaries[I]);
+    }
+
+    printf("Salaries:\n");//forward traversal
+    for(Node* node = list.head; node != NULL; node = node->next) {
+        printf("%.2f ", node->element);
+    }
+    return 0;
+}
+
+void ListInit(List* list) {
+    list->head = NULL;
+    list->tail = NULL;
+    list->_size = 0;
+}
+Node* CreateNode(T element) {
+    Node* node = (Node*)malloc(sizeof(Node));
+    node->element = element;
+    node->prev = NULL;
+    node->next = NULL;
+}
+void ListPushFront(List* list, T element) {
+
+}
+void ListPushBack(List* list, T element) { // x x
+    Node* node = CreateNode(element);      // x50000x
+    if(list->head == NULL) {               // x50000->  <-40000x 
+        list->head = node;
+        list->tail = node;
+    } else {
+        list->tail->next = node;
+        node->prev = list->tail;
+        list->tail = node;
+    }
+}
+int ListEmpty(List* list) {
+
+}
+T ListFront(List* list) {
+
+}
+T ListBack(List* list) {
+
+}
+void ListPopFront(List* list) {
+
+}
+void ListPopBack(List* list) {
+    
+}
