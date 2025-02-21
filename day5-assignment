@@ -1,0 +1,175 @@
+1.#include <stdio.h>
+#include <string.h>
+
+#define MAX_CALLS 5
+
+struct Call {
+    int callID;
+    char name[50];
+};
+
+int main() {
+    struct Call queue[MAX_CALLS];
+    int front = 0, rear = -1;
+
+    // Add new calls
+    rear++;
+    queue[rear] = (struct Call){101, "Alice"};
+    printf("New Call Added: Call 101 from Alice\n");
+
+    rear++;
+    queue[rear] = (struct Call){102, "Bob"};
+    printf("New Call Added: Call 102 from Bob\n");
+
+    // Process a call
+    printf("Processing Call: %d from %s\n", queue[front].callID, queue[front].name);
+    front++;
+
+    // Display remaining calls
+    printf("Remaining Calls: ");
+    for (int i = front; i <= rear; i++) {
+        printf("Call %d from %s ", queue[i].callID, queue[i].name);
+    }
+    printf("\n");
+
+    return 0;
+}
+
+2.#include <stdio.h>
+#include <string.h>
+
+#define MAX_SEATS 2  // Number of available seats
+
+// Define structure for passenger
+struct Passenger {
+    int passengerID;
+    char name[50];
+};
+
+int main() {
+    struct Passenger reservations[MAX_SEATS];  // Array to store reserved passengers
+    struct Passenger waitingList[10];           // Array for waiting list (up to 10 passengers)
+    int reservedCount = 0, waitingCount = 0;    // Counters for reserved and waiting passengers
+
+    // Add new reservations
+    reservations[reservedCount++] = (struct Passenger){1, "Alice"};
+    printf("Booking Confirmed: Passenger 1 (Alice)\n");
+
+    reservations[reservedCount++] = (struct Passenger){2, "Bob"};
+    printf("Booking Confirmed: Passenger 2 (Bob)\n");
+
+    // Try to add a third reservation, but the system is full
+    if (reservedCount < MAX_SEATS) {
+        reservations[reservedCount++] = (struct Passenger){3, "Charlie"};
+        printf("Booking Confirmed: Passenger 3 (Charlie)\n");
+    } else {
+        waitingList[waitingCount++] = (struct Passenger){3, "Charlie"};
+        printf("Waiting List: Passenger 3 (Charlie)\n");
+    }
+
+    // Display waiting list if there are any
+    if (waitingCount > 0) {
+        printf("Waiting List: ");
+        for (int i = 0; i < waitingCount; i++) {
+            printf("Passenger %d (%s) ", waitingList[i].passengerID, waitingList[i].name);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
+
+
+3.#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Define the structure for a patient
+struct Patient {
+    int id;
+    char name[50];
+    struct Patient *prev;
+    struct Patient *next;
+};
+
+// Function to create a new patient
+struct Patient* createPatient(int id, const char* name) {
+    struct Patient* newPatient = (struct Patient*)malloc(sizeof(struct Patient));
+    newPatient->id = id;
+    strcpy(newPatient->name, name);
+    newPatient->prev = NULL;
+    newPatient->next = NULL;
+    return newPatient;
+}
+
+// Function to add a patient to the list
+void addPatient(struct Patient** head, int id, const char* name) {
+    struct Patient* newPatient = createPatient(id, name);
+    if (*head == NULL) {
+        *head = newPatient;
+    } else {
+        struct Patient* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newPatient;
+        newPatient->prev = temp;
+    }
+    printf("New Patient Admitted: %s (ID %d)\n", name, id);
+}
+
+// Function to discharge a patient by name
+void dischargePatient(struct Patient** head, const char* name) {
+    struct Patient* temp = *head;
+    while (temp != NULL && strcmp(temp->name, name) != 0) {
+        temp = temp->next;
+    }
+    if (temp == NULL) {
+        printf("Patient not found!\n");
+        return;
+    }
+
+    if (temp->prev != NULL) {
+        temp->prev->next = temp->next;
+    } else {
+        *head = temp->next;  // If patient is the first node
+    }
+
+    if (temp->next != NULL) {
+        temp->next->prev = temp->prev;
+    }
+
+    printf("Discharging: %s\n", name);
+    free(temp);
+}
+
+// Function to display patients forward
+void displayPatientsForward(struct Patient* head) {
+    struct Patient* temp = head;
+    printf("Patients (Forward): ");
+    while (temp != NULL) {
+        printf("%s ↔ ", temp->name);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    struct Patient* head = NULL;
+
+    // Add new patients
+    addPatient(&head, 201, "John");
+    addPatient(&head, 202, "Mary");
+    addPatient(&head, 203, "David");
+
+    // Display patients
+    displayPatientsForward(head);
+
+    // Discharge a patient
+    dischargePatient(&head, "Mary");
+
+    // Display remaining patients
+    displayPatientsForward(head);
+
+    return 0;
+}
